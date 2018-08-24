@@ -63,7 +63,13 @@ if ! [[ -x "$(command -v nvidia-docker)" ]]; then
     fi
 fi
 
-echo "#!/usr/bin/env bash
-docker run --runtime=nvidia --net=host -e SHELL -e DISPLAY -e DOCKER=1 -v \"\$HOME:\$HOME:rw\" -v \"/tmp/.X11-unix:/tmp/.X11-unix:rw\" --workdir=\$(pwd) -it femtogram/ros:rosdocked \$SHELL" | sudo tee /usr/local/bin/rosdocker > /dev/null
+echo '#!/usr/bin/env bash
+DOCKERID=$(docker ps --filter "ancestor=femtogram/ros:rosdocked" --format "{{.ID}}")
+if [ ! -z "$DOCKERID" ]; then
+   docker exec -e SHELL -e DISPLAY -e DOCKER=1 --workdir=$(pwd) -it $DOCKERID $SHELL
+else
+   docker run --runtime=nvidia --net=host -e SHELL -e DISPLAY -e DOCKER=1 -v "$HOME:$HOME:rw" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" --workdir=$(pwd) -it femtogram/ros:rosdocked $SHELL
+fi
+' | sudo tee /usr/local/bin/rosdocker > /dev/null
 sudo chmod +x /usr/local/bin/rosdocker
-echo "Finished install script. Run with `rosdocker`"
+echo "Finished install script. Run with 'rosdocker'"
