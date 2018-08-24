@@ -1,4 +1,4 @@
-FROM ros:indigo
+FROM femtogram/ros:kinetic-desktop
 
 # Arguments
 ARG user
@@ -12,29 +12,41 @@ RUN apt-get -y update && apt-get install -y zsh screen tree sudo ssh synaptic
 
 # Latest X11 / mesa GL
 RUN apt-get install -y\
-  xserver-xorg-dev-lts-wily\
-  libegl1-mesa-dev-lts-wily\
-  libgl1-mesa-dev-lts-wily\
-  libgbm-dev-lts-wily\
-  mesa-common-dev-lts-wily\
-  libgles2-mesa-lts-wily\
-  libwayland-egl1-mesa-lts-wily\
-  libopenvg1-mesa
+  xserver-xorg-dev-lts-xenial\
+  libegl1-mesa-dev-lts-xenial\
+  libgl1-mesa-dev-lts-xenial\
+  libgbm-dev-lts-xenial\
+  mesa-common-dev-lts-xenial\
+  libgles2-mesa-lts-xenial\
+  libwayland-egl1-mesa-lts-xenial
 
 # Dependencies required to build rviz
 RUN apt-get install -y\
   qt4-dev-tools\
   libqt5core5a libqt5dbus5 libqt5gui5 libwayland-client0\
   libwayland-server0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1\
-  libxcb-render-util0 libxcb-util0 libxcb-xkb1 libxkbcommon-x11-0\
+  libxcb-render-util0 libxcb-util1 libxcb-xkb1 libxkbcommon-x11-0\
   libxkbcommon0
 
 # The rest of ROS-desktop
-RUN apt-get install -y ros-indigo-desktop-full
+RUN apt-get install -y ros-kinetic-desktop-full \
+    ros-kinetic-urg-node \
+    ros-kinetic-slam-gmapping
 
 # Additional development tools
 RUN apt-get install -y x11-apps python-pip build-essential
 RUN pip install catkin_tools
+
+# Install some additional ros stuff
+RUN apt-get install -y ros-kinetic-navigation \
+    ros-kinetic-teb-local-planner \
+    libsvm-dev
+
+RUN add-apt-repository ppa:nschloe/eigen-backports
+RUN apt-get update
+RUN apt-get install -y libeigen3-dev
+RUN apt-get install -y valgrind
+RUN apt-get install -y vim
 
 # Make SSH available
 EXPOSE 22
