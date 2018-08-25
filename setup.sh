@@ -65,10 +65,12 @@ fi
 
 echo '#!/usr/bin/env bash
 DOCKERID=$(docker ps --filter "ancestor=femtogram/ros:rosdocked" --format "{{.ID}}")
+
+[[ ! -z "$@" ]] && EXEC_CMD=(-c "$(IFS="$1"; echo "$@")") || EXEC_CMD=()
 if [ ! -z "$DOCKERID" ]; then
-   docker exec -e SHELL -e DISPLAY -e DOCKER=1 --workdir=$(pwd) -it $DOCKERID $SHELL
+   docker exec -e SHELL -e DISPLAY -e DOCKER=1 --workdir=$(pwd) -it $DOCKERID $SHELL "${EXEC_CMD[@]}"
 else
-   docker run --runtime=nvidia --net=host -e SHELL -e DISPLAY -e DOCKER=1 -v "$HOME:$HOME:rw" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" --workdir=$(pwd) -it femtogram/ros:rosdocked $SHELL
+   docker run --runtime=nvidia --net=host -e SHELL -e DISPLAY -e DOCKER=1 -v "$HOME:$HOME:rw" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" --workdir=$(pwd) -it femtogram/ros:rosdocked $SHELL "${EXEC_CMD[@]}"
 fi
 ' | sudo tee /usr/local/bin/rosdocker > /dev/null
 sudo chmod +x /usr/local/bin/rosdocker
