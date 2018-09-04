@@ -48,6 +48,25 @@ RUN apt-get install -y libeigen3-dev
 RUN apt-get install -y valgrind
 RUN apt-get install -y vim
 
+RUN echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list 
+RUN wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
+RUN apt-get update
+RUN apt-get install -y libgazebo9-dev ros-kinetic-gazebo9-ros ros-kinetic-gazebo9-ros-control ros-kinetic-gazebo9-plugins ros-kinetic-gazebo9-ros-pkgs
+
+RUN wget https://github.com/fmtlib/fmt/releases/download/5.1.0/fmt-5.1.0.zip
+RUN unzip fmt-5.1.0.zip
+RUN mkdir fmt-5.1.0/build && cd fmt-5.1.0/build && cmake -DBUILD_SHARED_LIBS=TRUE .. && make -j10 && make install
+
+RUN git clone --single-branch -b cpp-3.0.1 https://github.com/msgpack/msgpack-c.git && mkdir msgpack-c/build && cd msgpack-c/build && cmake -DMSGPACK_CXX11=ON .. && make -j10 && make install
+
+RUN apt-get install -y postgresql libpqxx-dev
+RUN apt-get install -y python3-gi python3-click python3-gi-cairo python3-cairo gir1.2-gtk-3.0
+RUN pip3 install zmq msgpack
+RUN apt-get install -y gir1.2-gdl-3
+
+RUN sed -i 's|export GAZEBO_MASTER_URI=http://localhost:11345|export GAZEBO_MASTER_URI=${GAZEBO_MASTER_URI:-"http://localhost:11345"}|' /usr/share/gazebo/setup.sh
+
+
 # Make SSH available
 EXPOSE 22
 
