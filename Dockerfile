@@ -28,6 +28,8 @@ RUN apt-get install -y\
   libxcb-render-util0 libxcb-util1 libxcb-xkb1 libxkbcommon-x11-0\
   libxkbcommon0
 
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 && apt-key del 421C365BD9FF1F717815A3895523BAEEB01FA116 && apt-get update
+
 # The rest of ROS-desktop
 RUN apt-get install -y ros-kinetic-desktop-full \
     ros-kinetic-urg-node \
@@ -61,6 +63,7 @@ RUN git clone --single-branch -b cpp-3.0.1 https://github.com/msgpack/msgpack-c.
 
 RUN apt-get install -y postgresql libpqxx-dev
 RUN apt-get install -y python3-gi python3-click python3-gi-cairo python3-cairo gir1.2-gtk-3.0
+RUN pip3 install --upgrade pip
 RUN pip3 install zmq msgpack
 RUN apt-get install -y gir1.2-gdl-3
 
